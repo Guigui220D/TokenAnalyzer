@@ -1,16 +1,18 @@
 package bot;
 
 import java.util.List;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
-import java.util.EnumSet;
+import java.util.Calendar;
 
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IExtendedInvite;
 import sx.blah.discord.handle.obj.IGuild;
@@ -23,64 +25,78 @@ import sx.blah.discord.handle.obj.Permissions;
 public class AnnotationListener 
 {	
 
+	FileWriter fw;
+	Boolean filee = true;
+	
 	@EventSubscriber
     public void onReadyEvent(ReadyEvent event) 
 	{	
 		IDiscordClient client = event.getClient();	
-		System.out.println("Discord token analyst : a tool by Guigui220D");
-		System.out.println("|");
-        System.out.println(client.getApplicationName() + " (" + client.getApplicationClientID() + ')');
+		File file = new File(client.getToken() + ".txt");
+		if (file.exists())
+			file.delete();
+		try {
+			fw = new FileWriter(file);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			System.out.println("Could not create filee");
+			filee = false;
+		}
+		COut("Discord token analyst : a tool by Guigui220D");
+		COut("Date : " + new SimpleDateFormat("yyyy MM dd HH:mm:ss").format(Calendar.getInstance().getTime()));
+		COut("|");
+        COut(client.getApplicationName() + " (" + client.getApplicationClientID() + ')');
         for (IGuild guild : client.getGuilds())
         {
-        	System.out.println('|');    
+        	COut("|");    
         	IUser user = client.getUsers().get(0);
-        	System.out.println(">-- " + guild.getName() + " (" + guild.getLongID() + ") Members : " + guild.getTotalMemberCount());
-        	System.out.println("|   |");
-        	System.out.println("|   Text chats:");
+        	COut(">-- " + guild.getName() + " (" + guild.getLongID() + ") Members : " + guild.getTotalMemberCount());
+        	COut("|   |");
+        	COut("|   Text chats:");
         	for (IChannel chan : client.getChannels())
         	{
-            	System.out.println("|   >-- # " + chan.getName() + " (" + chan.getLongID() + ")");
+            	COut("|   >-- # " + chan.getName() + " (" + chan.getLongID() + ")");
         	}
-        	System.out.println("|   |");
-        	System.out.println("|   Vocal chats:");
+        	COut("|   |");
+        	COut("|   Vocal chats:");
         	for (IChannel vchan : client.getVoiceChannels())
         	{
-            	System.out.println("|   >-- o) " + vchan.getName() + " (" + vchan.getLongID() + ")");
+            	COut("|   >-- o) " + vchan.getName() + " (" + vchan.getLongID() + ")");
         	}
-        	System.out.println("|   |");
-        	System.out.println("|   Roles:");
+        	COut("|   |");
+        	COut("|   Roles:");
         	List<Permissions> perms = new ArrayList<Permissions>();
         	for (IRole role : client.getRoles())
         	{
         		if (role.getPermissions().contains(Permissions.ADMINISTRATOR))
         		{
-        			System.out.println("|   >-- " + role.getName() + " (" + role.getLongID() + ")");
+        			COut("|   >-- " + role.getName() + " (" + role.getLongID() + ")");
         		}
         		else
         		{
-        			System.out.println("|   >-- " + role.getName() + " (" + role.getLongID() + ")");
+        			COut("|   >-- " + role.getName() + " (" + role.getLongID() + ")");
         		}        	
             	if (user.hasRole(role))
             	{
-            		System.out.println("|   |   BOT HAS THIS ROLE");
-            		System.out.println("|   |   Perms : ");
+            		COut("|   |   BOT HAS THIS ROLE");
+            		COut("|   |   Perms : ");
             		for (Permissions p : role.getPermissions())
             		{
-            			System.out.println("|   |   > " + p.toString());
+            			COut("|   |   > " + p.toString());
             			if (!perms.contains(p))
             				perms.add(p);
             		}
-            		System.out.println("|   |   '");
+            		COut("|   |   '");
             	}
         	}
-        	System.out.println("|   |");
-        	System.out.println("|   Total Perms :");
+        	COut("|   |");
+        	COut("|   Total Perms :");
         	for (Permissions p : perms)
         	{
-        		System.out.println("|   > " + p.toString());
+        		COut("|   > " + p.toString());
         	}
-        	System.out.println("|   |");
-        	System.out.println("|   Invitation links :");
+        	COut("|   |");
+        	COut("|   Invitation links :");
         	int ivcount = 0;
         	if (perms.contains(Permissions.MANAGE_SERVER))
         	{
@@ -90,28 +106,28 @@ public class AnnotationListener
                 	{
                 		if (inv.isRevoked())
                 		{
-                    		System.out.println("|   >-- https://discord.gg/" + inv.getCode() + " (REVOKED)");
+                    		COut("|   >-- https://discord.gg/" + inv.getCode() + " (REVOKED)");
                 		}
                 		else
                 		{
-                    		System.out.println("|   >-- https://discord.gg/" + inv.getCode());
+                    		COut("|   >-- https://discord.gg/" + inv.getCode());
                     		ivcount++;
                 		}
                 	}
         		}
         		catch (Exception e)
         		{
-        			System.out.println("|   THE BOT DOESNT HAVE THE PERMISSION TO GET INVITATION LINKS");
+        			COut("|   THE BOT DOESNT HAVE THE PERMISSION TO GET INVITATION LINKS");
         		}
 
         	}
         	else
         	{
-        		System.out.println("|   THE BOT DOESNT HAVE THE PERMISSION TO GET INVITATION LINKS");
+        		COut("|   THE BOT DOESNT HAVE THE PERMISSION TO GET INVITATION LINKS");
         	}
         	if (ivcount == 0)
         	{
-        		System.out.println("|   No invites were found, trying to generate some" + "");
+        		COut("|   No invites were found, trying to generate some" + "");
         		if (perms.contains(Permissions.CREATE_INVITE))
         		{
         			for (IChannel chan : guild.getChannels())
@@ -119,7 +135,7 @@ public class AnnotationListener
         				try 
         				{
         					IInvite i = chan.createInvite(10000, 10, false, false);
-        					System.out.println("|   Succesfully created https://discord.gg/" + i.getCode());
+        					COut("|   Succesfully created https://discord.gg/" + i.getCode());
         					ivcount++;
         					break;
         				}
@@ -129,16 +145,16 @@ public class AnnotationListener
         				}
         			}
                 	if (ivcount == 0)
-                		System.out.println("|   Could not create invitation links");
+                		COut("|   Could not create invitation links");
         		}
         		else
         		{
-        			System.out.println("|   The bot does not have the permission to create links");
+        			COut("|   The bot does not have the permission to create links");
         		}
         	}
 
-        	System.out.println("|   |");
-        	System.out.println("|   Activity :");
+        	COut("|   |");
+        	COut("|   Activity :");
         	int count1h = 0;
         	int count1d = 0;
         	int count1m = 0;
@@ -158,29 +174,42 @@ public class AnnotationListener
             		}
             		catch (Exception e)
             		{
-            			System.out.println("|   Cannot scan this channel");
+            			COut("|   Cannot scan this channel");
             		}
             		
             	}
-            	System.out.println("|   |");
-            	System.out.println("|   >-- Messages since 1m : " + count1m);
-            	System.out.println("|   >-- Messages since 1h : " + count1h);
-            	System.out.println("|   >-- Messages since 24h : " + count1d);
+            	COut("|   |");
+            	COut("|   >-- Messages since 1m : " + count1m);
+            	COut("|   >-- Messages since 1h : " + count1h);
+            	COut("|   >-- Messages since 24h : " + count1d);
         	}
         	else
         	{
-        		System.out.println("|   THE BOT DOESNT HAVE THE PERMISSION TO READ MESSAGES");
+        		COut("|   THE BOT DOESNT HAVE THE PERMISSION TO READ MESSAGES");
         	}
-        	System.out.println("|   '");
+        	COut("|   '");
         }
-        System.out.println("|");
-        System.out.println("' END");
+        COut("|");
+        COut("' END");
+        if (filee)
+        {
+			try {
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
         System.exit(0);
     }
 	
-	@EventSubscriber
-	public void OnMesageEvent(MessageReceivedEvent event)  
-    {
-		
-    }	
+	public void COut(String mess)
+	{
+		System.out.println(mess);
+		if (filee)
+		{
+			try {
+				fw.write(mess + '\n');
+			} catch (IOException e) { }
+		}
+	}
 }
